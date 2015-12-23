@@ -24,37 +24,38 @@ var WeatherComponent = React.createClass({
 var SearchComponent = React.createClass({
 	getInitialState: function() {
 		return {
+			jsonData: [],
 			filePath: 'files/cities.json'
-
 		}
 	},
 	addCity: function() {
 		var city = this.refs.city.value;
-
-		// Получпем файл с городами
-		// добавить город в файл
-		// сравнить есть ли в файле данный город
 		this.getCityFile();
 	},
 	getCityFile:function() {
 		$.getJSON(this.state.filePath, function( data ) {
-			console.log(data);
-		});
-
-		$.ajax({
-			url: 'this.state.filePath',
-			type: 'POST',
-			dataType: 'json',
-		})
-		.success(function(data) {
-			console.log(data);
-		});
+			// var myArray = Array();
+			// $.each(data, function(id, value) {
+			// 	myArray.push(value);
+			// });
 
 
+
+			if(typeof(Storage) !== "undefined") {
+			   localJson = localStorage.getItem("cities");
+			} else {
+			    // Sorry! No Web Storage support..
+			}
+
+			// Забиваем МАССИВ в state
+			// this.setState({jsonData: myArray});
+		}.bind(this));
 
 	},
 	render: function() {
+
 		return (
+			<div>
 			<div className="col-md-6">
 				<form className="">
 					<h2>Add city</h2>
@@ -66,13 +67,36 @@ var SearchComponent = React.createClass({
 				</form>
 				<button className="btn btn-default" onClick={this.addCity}>Add city</button>
 			</div>
+
+			<CitiesComponent jsondata={this.state.jsonData} />
+			</div>
 		)
 	}
 });
+
+
+var CitiesComponent = React.createClass({
+	render: function() {
+		var results = this.props.jsondata;
+
+		return (
+			<div className="col-md-6">
+				{
+					results.map(function(result, i) {
+						return <div className="city" key="i">{result.name}</div>;
+					})
+				}
+			</div>
+		)
+	}
+});
+
+
+/*------------------------------------*\
+    Init
+\*------------------------------------*/
 
 ReactDOM.render(
 	<WeatherComponent />,
 	document.getElementById('content')
 );
-
-

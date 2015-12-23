@@ -24,37 +24,38 @@ var WeatherComponent = React.createClass({displayName: "WeatherComponent",
 var SearchComponent = React.createClass({displayName: "SearchComponent",
 	getInitialState: function() {
 		return {
+			jsonData: [],
 			filePath: 'files/cities.json'
-
 		}
 	},
 	addCity: function() {
 		var city = this.refs.city.value;
-
-		// Получпем файл с городами
-		// добавить город в файл
-		// сравнить есть ли в файле данный город
 		this.getCityFile();
 	},
 	getCityFile:function() {
 		$.getJSON(this.state.filePath, function( data ) {
-			console.log(data);
-		});
-
-		$.ajax({
-			url: 'this.state.filePath',
-			type: 'POST',
-			dataType: 'json',
-		})
-		.success(function(data) {
-			console.log(data);
-		});
+			// var myArray = Array();
+			// $.each(data, function(id, value) {
+			// 	myArray.push(value);
+			// });
 
 
+
+			if(typeof(Storage) !== "undefined") {
+			   localJson = localStorage.getItem("cities");
+			} else {
+			    // Sorry! No Web Storage support..
+			}
+
+			// Забиваем МАССИВ в state
+			// this.setState({jsonData: myArray});
+		}.bind(this));
 
 	},
 	render: function() {
+
 		return (
+			React.createElement("div", null, 
 			React.createElement("div", {className: "col-md-6"}, 
 				React.createElement("form", {className: ""}, 
 					React.createElement("h2", null, "Add city"), 
@@ -65,14 +66,37 @@ var SearchComponent = React.createClass({displayName: "SearchComponent",
 					)
 				), 
 				React.createElement("button", {className: "btn btn-default", onClick: this.addCity}, "Add city")
+			), 
+
+			React.createElement(CitiesComponent, {jsondata: this.state.jsonData})
 			)
 		)
 	}
 });
 
+
+var CitiesComponent = React.createClass({displayName: "CitiesComponent",
+	render: function() {
+		var results = this.props.jsondata;
+
+		return (
+			React.createElement("div", {className: "col-md-6"}, 
+				
+					results.map(function(result, i) {
+						return React.createElement("div", {className: "city", key: "i"}, result.name);
+					})
+				
+			)
+		)
+	}
+});
+
+
+/*------------------------------------*\
+    Init
+\*------------------------------------*/
+
 ReactDOM.render(
 	React.createElement(WeatherComponent, null),
 	document.getElementById('content')
 );
-
-

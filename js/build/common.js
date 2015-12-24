@@ -6,12 +6,32 @@
 // * Сохранять локально данные
 // * Автоматически запрашивать погода по координатам пользователя - это город/место по умолчанию.
 
+/*------------------------------------*\
+    Get data from localstorage
+\*------------------------------------*/
+
+if(typeof(Storage) !== "undefined") {
+	var data = localStorage.getItem("cities");
+	if(data) {
+		data = JSON.parse(data);
+		console.log(data);
+
+		var myArray = Array();
+		// $.map(data., function(id, value) {
+		// 	myArray.push(value);
+		// 	// console.log(id);
+		// });
+
+
+		console.log(typeof myArray);
+	}
+}
+
+
+
+
+
 var WeatherComponent = React.createClass({displayName: "WeatherComponent",
-	getInitialState: function() {
-		return {
-			// city,
-		}
-	},
 	render: function() {
 		return (
 			React.createElement("div", null, 
@@ -24,51 +44,72 @@ var WeatherComponent = React.createClass({displayName: "WeatherComponent",
 var SearchComponent = React.createClass({displayName: "SearchComponent",
 	getInitialState: function() {
 		return {
-			jsonData: [],
+			jsonData: data,
 			filePath: 'files/cities.json'
 		}
 	},
 	addCity: function() {
 		var city = this.refs.city.value;
-		this.getCityFile();
+		this.getCity();
 	},
-	getCityFile:function() {
-		$.getJSON(this.state.filePath, function( data ) {
-			// var myArray = Array();
-			// $.each(data, function(id, value) {
-			// 	myArray.push(value);
-			// });
+	getCity:function() {
+		var localJson = this.getStorage();
+		localJson = JSON.parse(localJson);
 
-
-
-			if(typeof(Storage) !== "undefined") {
-			   localJson = localStorage.getItem("cities");
-			} else {
-			    // Sorry! No Web Storage support..
+		if(localJson) {
+			// Если есть совпадения (for потому что в другиз циклах break не работает)
+			for (var i = 0; i < localJson.length; i++) {
+				if(this.refs.city.value === localJson[i].city) {
+					console.log('ok');
+					return false;
+				}
 			}
 
-			// Забиваем МАССИВ в state
-			// this.setState({jsonData: myArray});
-		}.bind(this));
+			//Если совпадения нет добавляем в localstorage
+			this.setState({jsonData: localJson});
+			this.setStorage(localJson);
+		} else {
+			var arr = Array();
+			this.setState({jsonData: arr});
+			this.setStorage(arr);
+		}
 
+		// console.log(this.state.jsonData);
+	},
+	getStorage: function() {
+		if(typeof(Storage) !== "undefined") {
+			var localJson = localStorage.getItem("cities");
+			return localJson;
+		}
+	},
+	setStorage: function(localJson) {
+		if(typeof(Storage) !== "undefined") {
+			var arr = {
+				city: this.refs.city.value,
+				weather: '12C',
+			};
+
+			localJson.push(arr);
+			storageString = JSON.stringify(localJson);
+			localStorage.setItem("cities", storageString);
+		}
 	},
 	render: function() {
-
 		return (
 			React.createElement("div", null, 
-			React.createElement("div", {className: "col-md-6"}, 
-				React.createElement("form", {className: ""}, 
-					React.createElement("h2", null, "Add city"), 
-					React.createElement("div", {className: "form-group"}, 
-						React.createElement("input", {className: "form-control", ref: "city", placeholder: "City"})
+				React.createElement("div", {className: "col-md-6"}, 
+					React.createElement("form", {className: ""}, 
+						React.createElement("h2", null, "Add city"), 
+						React.createElement("div", {className: "form-group"}, 
+							React.createElement("input", {className: "form-control", ref: "city", placeholder: "City"})
+						), 
+						React.createElement("div", {className: "form-group"}
+						)
 					), 
-					React.createElement("div", {className: "form-group"}
-					)
+					React.createElement("button", {className: "btn btn-default", onClick: this.addCity}, "Add city")
 				), 
-				React.createElement("button", {className: "btn btn-default", onClick: this.addCity}, "Add city")
-			), 
 
-			React.createElement(CitiesComponent, {jsondata: this.state.jsonData})
+				React.createElement(CitiesComponent, {jsondata: this.state.jsonData})
 			)
 		)
 	}
@@ -76,16 +117,27 @@ var SearchComponent = React.createClass({displayName: "SearchComponent",
 
 
 var CitiesComponent = React.createClass({displayName: "CitiesComponent",
+	delStorage: function() {
+		console.log('deleted');
+	},
 	render: function() {
 		var results = this.props.jsondata;
 
 		return (
 			React.createElement("div", {className: "col-md-6"}, 
-				
-					results.map(function(result, i) {
-						return React.createElement("div", {className: "city", key: "i"}, result.name);
-					})
-				
+				React.createElement("div", {className: "row cities"}, 
+					
+						results.map(function(result, i) {
+							return (
+								React.createElement("div", {key: i, className: "col-md-4"}, 
+									React.createElement("div", {className: "city"}, 
+										React.createElement("button", {onClick: this.delStorage.bind(this, i), className: "del-city"}, "wqw"), 
+										React.createElement("p", null, result.city)
+									)
+								));
+						},this)
+					
+				)
 			)
 		)
 	}
@@ -100,3 +152,4 @@ ReactDOM.render(
 	React.createElement(WeatherComponent, null),
 	document.getElementById('content')
 );
+

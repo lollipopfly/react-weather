@@ -6,12 +6,32 @@
 // * Сохранять локально данные
 // * Автоматически запрашивать погода по координатам пользователя - это город/место по умолчанию.
 
+/*------------------------------------*\
+    Get data from localstorage
+\*------------------------------------*/
+
+if(typeof(Storage) !== "undefined") {
+	var data = localStorage.getItem("cities");
+	if(data) {
+		data = JSON.parse(data);
+		console.log(data);
+
+		var myArray = Array();
+		// $.map(data., function(id, value) {
+		// 	myArray.push(value);
+		// 	// console.log(id);
+		// });
+
+
+		console.log(typeof myArray);
+	}
+}
+
+
+
+
+
 var WeatherComponent = React.createClass({
-	getInitialState: function() {
-		return {
-			// city,
-		}
-	},
 	render: function() {
 		return (
 			<div>
@@ -24,51 +44,72 @@ var WeatherComponent = React.createClass({
 var SearchComponent = React.createClass({
 	getInitialState: function() {
 		return {
-			jsonData: [],
+			jsonData: data,
 			filePath: 'files/cities.json'
 		}
 	},
 	addCity: function() {
 		var city = this.refs.city.value;
-		this.getCityFile();
+		this.getCity();
 	},
-	getCityFile:function() {
-		$.getJSON(this.state.filePath, function( data ) {
-			// var myArray = Array();
-			// $.each(data, function(id, value) {
-			// 	myArray.push(value);
-			// });
+	getCity:function() {
+		var localJson = this.getStorage();
+		localJson = JSON.parse(localJson);
 
-
-
-			if(typeof(Storage) !== "undefined") {
-			   localJson = localStorage.getItem("cities");
-			} else {
-			    // Sorry! No Web Storage support..
+		if(localJson) {
+			// Если есть совпадения (for потому что в другиз циклах break не работает)
+			for (var i = 0; i < localJson.length; i++) {
+				if(this.refs.city.value === localJson[i].city) {
+					console.log('ok');
+					return false;
+				}
 			}
 
-			// Забиваем МАССИВ в state
-			// this.setState({jsonData: myArray});
-		}.bind(this));
+			//Если совпадения нет добавляем в localstorage
+			this.setState({jsonData: localJson});
+			this.setStorage(localJson);
+		} else {
+			var arr = Array();
+			this.setState({jsonData: arr});
+			this.setStorage(arr);
+		}
 
+		// console.log(this.state.jsonData);
+	},
+	getStorage: function() {
+		if(typeof(Storage) !== "undefined") {
+			var localJson = localStorage.getItem("cities");
+			return localJson;
+		}
+	},
+	setStorage: function(localJson) {
+		if(typeof(Storage) !== "undefined") {
+			var arr = {
+				city: this.refs.city.value,
+				weather: '12C',
+			};
+
+			localJson.push(arr);
+			storageString = JSON.stringify(localJson);
+			localStorage.setItem("cities", storageString);
+		}
 	},
 	render: function() {
-
 		return (
 			<div>
-			<div className="col-md-6">
-				<form className="">
-					<h2>Add city</h2>
-					<div className="form-group">
-						<input className="form-control" ref="city" placeholder="City" />
-					</div>
-					<div className="form-group">
-					</div>
-				</form>
-				<button className="btn btn-default" onClick={this.addCity}>Add city</button>
-			</div>
+				<div className="col-md-6">
+					<form className="">
+						<h2>Add city</h2>
+						<div className="form-group">
+							<input className="form-control" ref="city" placeholder="City" />
+						</div>
+						<div className="form-group">
+						</div>
+					</form>
+					<button className="btn btn-default" onClick={this.addCity}>Add city</button>
+				</div>
 
-			<CitiesComponent jsondata={this.state.jsonData} />
+				<CitiesComponent jsondata={this.state.jsonData} />
 			</div>
 		)
 	}
@@ -76,16 +117,27 @@ var SearchComponent = React.createClass({
 
 
 var CitiesComponent = React.createClass({
+	delStorage: function() {
+		console.log('deleted');
+	},
 	render: function() {
 		var results = this.props.jsondata;
 
 		return (
 			<div className="col-md-6">
-				{
-					results.map(function(result, i) {
-						return <div className="city" key="i">{result.name}</div>;
-					})
-				}
+				<div className="row cities">
+					{
+						results.map(function(result, i) {
+							return (
+								<div key={i} className="col-md-4">
+									<div className="city">
+										<button onClick={this.delStorage.bind(this, i)} className="del-city">wqw</button>
+										<p>{result.city}</p>
+									</div>
+								</div>);
+						},this)
+					}
+				</div>
 			</div>
 		)
 	}
@@ -100,3 +152,4 @@ ReactDOM.render(
 	<WeatherComponent />,
 	document.getElementById('content')
 );
+

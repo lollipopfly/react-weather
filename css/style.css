@@ -2,3 +2,36 @@
 #cities {
 	margin-top: 10px;
 }
+
+.cities {
+	margin-top: 62px;
+}
+.city {
+	position: relative;
+	background: #F1F0F0;
+	min-height: 100px;
+	padding-left: 10px;
+	padding-top: 20px;
+}
+
+.del-city {
+/*	position: absolute;
+	top: 0px;
+	right: 10px;
+	display: block;
+	width: 10px;
+	height: 10px;
+	outline: none;
+	border: none;
+	background: none;*/
+}
+
+/*.del-city:after {
+	content: '\f00d';
+	font-family: FontAwesome;
+	position: absolute;
+	top: 0;
+	left: 0;
+	color: orange;
+	font-size: 20px;
+}*/

@@ -14,21 +14,8 @@ if(typeof(Storage) !== "undefined") {
 	var data = localStorage.getItem("cities");
 	if(data) {
 		data = JSON.parse(data);
-		console.log(data);
-
-		var myArray = Array();
-		// $.map(data., function(id, value) {
-		// 	myArray.push(value);
-		// 	// console.log(id);
-		// });
-
-
-		console.log(typeof myArray);
 	}
 }
-
-
-
 
 
 var WeatherComponent = React.createClass({displayName: "WeatherComponent",
@@ -40,6 +27,8 @@ var WeatherComponent = React.createClass({displayName: "WeatherComponent",
 		)
 	}
 });
+
+
 
 var SearchComponent = React.createClass({displayName: "SearchComponent",
 	getInitialState: function() {
@@ -73,8 +62,6 @@ var SearchComponent = React.createClass({displayName: "SearchComponent",
 			this.setState({jsonData: arr});
 			this.setStorage(arr);
 		}
-
-		// console.log(this.state.jsonData);
 	},
 	getStorage: function() {
 		if(typeof(Storage) !== "undefined") {
@@ -94,7 +81,22 @@ var SearchComponent = React.createClass({displayName: "SearchComponent",
 			localStorage.setItem("cities", storageString);
 		}
 	},
+	delStorage: function(aa) {
+		// Получаем из файла города
+		var localJson = this.getStorage();
+		console.log(aa);
+		if(localJson) {
+			// Если есть совпадения (for потому что в другиз циклах break не работает)
+			// for (var i = 0; i < localJson.length; i++) {
+			// 	if(this.refs.city.value === localJson[i].city) {
+			// 		console.log('ok del him');
+			// 		return false;
+			// 	}
+			// }
+		}
+	},
 	render: function() {
+		var exposeClick = this.delStorage; // Передаем этот метод в другой компонент
 		return (
 			React.createElement("div", null, 
 				React.createElement("div", {className: "col-md-6"}, 
@@ -109,7 +111,7 @@ var SearchComponent = React.createClass({displayName: "SearchComponent",
 					React.createElement("button", {className: "btn btn-default", onClick: this.addCity}, "Add city")
 				), 
 
-				React.createElement(CitiesComponent, {jsondata: this.state.jsonData})
+				React.createElement(CitiesComponent, {onClick: exposeClick, jsondata: this.state.jsonData})
 			)
 		)
 	}
@@ -117,12 +119,10 @@ var SearchComponent = React.createClass({displayName: "SearchComponent",
 
 
 var CitiesComponent = React.createClass({displayName: "CitiesComponent",
-	delStorage: function() {
-		console.log('deleted');
-	},
 	render: function() {
 		var results = this.props.jsondata;
 
+		// В <button onClick={this.props.onClick} принимаем меод их другого компонента
 		return (
 			React.createElement("div", {className: "col-md-6"}, 
 				React.createElement("div", {className: "row cities"}, 
@@ -131,7 +131,7 @@ var CitiesComponent = React.createClass({displayName: "CitiesComponent",
 							return (
 								React.createElement("div", {key: i, className: "col-md-4"}, 
 									React.createElement("div", {className: "city"}, 
-										React.createElement("button", {onClick: this.delStorage.bind(this, i), className: "del-city"}, "wqw"), 
+										React.createElement("button", {onClick: this.props.onClick.bind(null, result.city), className: "del-city"}), 
 										React.createElement("p", null, result.city)
 									)
 								));

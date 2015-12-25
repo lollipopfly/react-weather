@@ -14,21 +14,8 @@ if(typeof(Storage) !== "undefined") {
 	var data = localStorage.getItem("cities");
 	if(data) {
 		data = JSON.parse(data);
-		console.log(data);
-
-		var myArray = Array();
-		// $.map(data., function(id, value) {
-		// 	myArray.push(value);
-		// 	// console.log(id);
-		// });
-
-
-		console.log(typeof myArray);
 	}
 }
-
-
-
 
 
 var WeatherComponent = React.createClass({
@@ -40,6 +27,8 @@ var WeatherComponent = React.createClass({
 		)
 	}
 });
+
+
 
 var SearchComponent = React.createClass({
 	getInitialState: function() {
@@ -73,8 +62,6 @@ var SearchComponent = React.createClass({
 			this.setState({jsonData: arr});
 			this.setStorage(arr);
 		}
-
-		// console.log(this.state.jsonData);
 	},
 	getStorage: function() {
 		if(typeof(Storage) !== "undefined") {
@@ -94,7 +81,22 @@ var SearchComponent = React.createClass({
 			localStorage.setItem("cities", storageString);
 		}
 	},
+	delStorage: function(aa) {
+		// Получаем из файла города
+		var localJson = this.getStorage();
+		console.log(aa);
+		if(localJson) {
+			// Если есть совпадения (for потому что в другиз циклах break не работает)
+			// for (var i = 0; i < localJson.length; i++) {
+			// 	if(this.refs.city.value === localJson[i].city) {
+			// 		console.log('ok del him');
+			// 		return false;
+			// 	}
+			// }
+		}
+	},
 	render: function() {
+		var exposeClick = this.delStorage; // Передаем этот метод в другой компонент
 		return (
 			<div>
 				<div className="col-md-6">
@@ -109,7 +111,7 @@ var SearchComponent = React.createClass({
 					<button className="btn btn-default" onClick={this.addCity}>Add city</button>
 				</div>
 
-				<CitiesComponent jsondata={this.state.jsonData} />
+				<CitiesComponent onClick={exposeClick} jsondata={this.state.jsonData} />
 			</div>
 		)
 	}
@@ -117,12 +119,10 @@ var SearchComponent = React.createClass({
 
 
 var CitiesComponent = React.createClass({
-	delStorage: function() {
-		console.log('deleted');
-	},
 	render: function() {
 		var results = this.props.jsondata;
 
+		// В <button onClick={this.props.onClick} принимаем меод их другого компонента
 		return (
 			<div className="col-md-6">
 				<div className="row cities">
@@ -131,7 +131,7 @@ var CitiesComponent = React.createClass({
 							return (
 								<div key={i} className="col-md-4">
 									<div className="city">
-										<button onClick={this.delStorage.bind(this, i)} className="del-city">wqw</button>
+										<button onClick={this.props.onClick.bind(null, result.city)} className="del-city"></button>
 										<p>{result.city}</p>
 									</div>
 								</div>);

@@ -10,11 +10,9 @@
 </head>
 <body>
 	<div class="container">
-		<div class="row" id="content">
-
-			</div>
-		</div>
+		<div class="row" id="content"></div>
 	</div>
+
 
 	<div id="weather"></div>
 	<script src="https://fb.me/react-0.14.3.js"></script>

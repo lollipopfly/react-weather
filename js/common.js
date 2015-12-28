@@ -34,7 +34,8 @@ var SearchComponent = React.createClass({
 	getInitialState: function() {
 		return {
 			jsonData: storageData,
-			filePath: 'files/cities.json'
+			filePath: 'files/cities.json',
+			weatherTemp: ''
 		}
 	},
 	addCity: function() {
@@ -73,17 +74,32 @@ var SearchComponent = React.createClass({
 	setStorage: function(localJson) {
 		if(typeof(Storage) !== "undefined") {
 
-			// get weather from plugin api
-			var weather = this.getWeather(this.refs.city.value);
-			console.log(weather + 'last');
-			var arr = {
-				city: this.refs.city.value,
-				weather: weather,
-			};
+			$.simpleWeather({
+			    location: city,
+			    woeid: '',
+			    unit: 'c',
+			    success: function(weather) {
+			    	// var html = weather.temp+'°C';
+			    	var arr = {
+						city: city,
+						temp: weather.temp+'°C',
+					};
+					console.log(arr);
 
-			localJson.push(arr);
-			storageString = JSON.stringify(localJson);
-			localStorage.setItem("cities", storageString);
+					localJson.push(arr);
+					storageString = JSON.stringify(localJson);
+					localStorage.setItem("cities", storageString);
+
+			    },
+			    error: function(error) {
+			    	console.log(error);
+			      $("#weather").html('<p>'+error+'</p>');
+			    }
+			  });
+
+
+			// var arr = this.getWeather(this.refs.city.value);
+
 		}
 	},
 	updateStorage: function() {
@@ -107,21 +123,6 @@ var SearchComponent = React.createClass({
 				}
 			}
 		}
-
-		// variant 1
-		// var localJson = JSON.parse(this.getStorage());
-
-		// if(localJson) {
-		// 	//Если есть совпадения (for потому что в другиз циклах break не работает)
-		// 	for ( var i in localJson ) {
-		// 		if(city === localJson[i].city) {
-		// 			delete localJson[i];
-		// 			localJson.splice(i,1); // Хак (при удалении появляется null)
-		// 			this.updateStorage(localJson);
-		// 			break;
-		// 		}
-		// 	}
-		// }
 	},
 
 	getWeather: function(city) {
@@ -130,16 +131,20 @@ var SearchComponent = React.createClass({
 		    woeid: '',
 		    unit: 'c',
 		    success: function(weather) {
-		     var html = weather.temp+'°C';
-		     console.log(weather);
+		    	// var html = weather.temp+'°C';
+		    	var arr = {
+					city: city,
+					temp: weather.temp+'°C',
+				};
+
+			  return arr;
 		    },
 		    error: function(error) {
 		    	console.log(error);
 		      $("#weather").html('<p>'+error+'</p>');
 		    }
 		  });
-		      console.log(html);
-		      return html;
+
 	},
 	render: function() {
 		var exposeClick = this.delStorage; // Передаем этот метод в другой компонент
@@ -180,7 +185,7 @@ var CitiesComponent = React.createClass({
 										<div className="city">
 											<button onClick={this.props.onClick.bind(null, result.city)} className="del-city"></button>
 											<p>{result.city}</p>
-											<p>{result.weather}</p>
+											<p>{result.temp}</p>
 										</div>
 									</div>);
 							},this)

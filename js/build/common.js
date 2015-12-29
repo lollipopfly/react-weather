@@ -73,20 +73,26 @@ var SearchComponent = React.createClass({displayName: "SearchComponent",
 	},
 	setStorage: function(localJson) {
 		if(typeof(Storage) !== "undefined") {
+			var myCity = this.refs.city.value,
+				that = this;
 
 			$.simpleWeather({
-			    location: city,
+			    location: myCity,
 			    woeid: '',
 			    unit: 'c',
 			    success: function(weather) {
-			    	// var html = weather.temp+'°C';
 			    	var arr = {
-						city: city,
+						city: myCity,
 						temp: weather.temp+'°C',
+						thumbnail: weather.thumbnail,
 					};
-					console.log(arr);
-
+					console.log(weather);
 					localJson.push(arr);
+
+					// Обновляем список городов
+					that.setState({jsonData: localJson});
+
+					// Записываем в localstorage
 					storageString = JSON.stringify(localJson);
 					localStorage.setItem("cities", storageString);
 
@@ -96,17 +102,11 @@ var SearchComponent = React.createClass({displayName: "SearchComponent",
 			      $("#weather").html('<p>'+error+'</p>');
 			    }
 			  });
-
-
-			// var arr = this.getWeather(this.refs.city.value);
-
 		}
 	},
 	updateStorage: function() {
 		object = JSON.stringify(this.state.jsonData);
 		localStorage.setItem("cities", object);
-		console.log(this.state.jsonData);
-
 	},
 	delStorage: function(city) {
 		// Получаем из файла города
@@ -117,34 +117,14 @@ var SearchComponent = React.createClass({displayName: "SearchComponent",
 				if(city === localJson[i].city) {
 					delete localJson[i];
 					localJson.splice(i,1); // Хак (при удалении появляется null)
+
+					// Обновляем список городов
 					this.setState({jsonData: localJson});
 					this.updateStorage();
 					break;
 				}
 			}
 		}
-	},
-
-	getWeather: function(city) {
-		$.simpleWeather({
-		    location: city,
-		    woeid: '',
-		    unit: 'c',
-		    success: function(weather) {
-		    	// var html = weather.temp+'°C';
-		    	var arr = {
-					city: city,
-					temp: weather.temp+'°C',
-				};
-
-			  return arr;
-		    },
-		    error: function(error) {
-		    	console.log(error);
-		      $("#weather").html('<p>'+error+'</p>');
-		    }
-		  });
-
 	},
 	render: function() {
 		var exposeClick = this.delStorage; // Передаем этот метод в другой компонент
@@ -185,7 +165,8 @@ var CitiesComponent = React.createClass({displayName: "CitiesComponent",
 										React.createElement("div", {className: "city"}, 
 											React.createElement("button", {onClick: this.props.onClick.bind(null, result.city), className: "del-city"}), 
 											React.createElement("p", null, result.city), 
-											React.createElement("p", null, result.temp)
+											React.createElement("p", null, result.temp), 
+											React.createElement("p", null, React.createElement("img", {src: result.thumbnail}))
 										)
 									));
 							},this)

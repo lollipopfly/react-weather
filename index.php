@@ -12,7 +12,6 @@
 	<div class="container">
 		<div class="row" id="content"></div>
 	</div>
-
 	<script src="https://fb.me/react-0.14.3.js"></script>
 	<script src="https://fb.me/react-dom-0.14.3.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>

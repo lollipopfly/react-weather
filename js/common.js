@@ -38,7 +38,8 @@ var SearchComponent = React.createClass({
 			weatherTemp: ''
 		}
 	},
-	addCity: function() {
+	addCity: function(e) {
+		e.preventDefault();
 		var city = this.refs.city.value;
 		this.getCity();
 	},
@@ -131,15 +132,15 @@ var SearchComponent = React.createClass({
 		return (
 			<div>
 				<div className="col-md-6">
-					<form className="">
+					<form className="" onSubmit={this.addCity}>
 						<h2>Add city</h2>
 						<div className="form-group">
 							<input className="form-control" ref="city" placeholder="City" />
 						</div>
 						<div className="form-group">
 						</div>
+					<button className="btn btn-default">Add city</button>
 					</form>
-					<button className="btn btn-default" onClick={this.addCity}>Add city</button>
 				</div>
 
 				<CitiesComponent onClick={exposeClick} jsondata={this.state.jsonData} />

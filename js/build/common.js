@@ -38,7 +38,8 @@ var SearchComponent = React.createClass({displayName: "SearchComponent",
 			weatherTemp: ''
 		}
 	},
-	addCity: function() {
+	addCity: function(e) {
+		e.preventDefault();
 		var city = this.refs.city.value;
 		this.getCity();
 	},
@@ -131,15 +132,15 @@ var SearchComponent = React.createClass({displayName: "SearchComponent",
 		return (
 			React.createElement("div", null, 
 				React.createElement("div", {className: "col-md-6"}, 
-					React.createElement("form", {className: ""}, 
+					React.createElement("form", {className: "", onSubmit: this.addCity}, 
 						React.createElement("h2", null, "Add city"), 
 						React.createElement("div", {className: "form-group"}, 
 							React.createElement("input", {className: "form-control", ref: "city", placeholder: "City"})
 						), 
 						React.createElement("div", {className: "form-group"}
-						)
-					), 
-					React.createElement("button", {className: "btn btn-default", onClick: this.addCity}, "Add city")
+						), 
+					React.createElement("button", {className: "btn btn-default"}, "Add city")
+					)
 				), 
 
 				React.createElement(CitiesComponent, {onClick: exposeClick, jsondata: this.state.jsonData})
